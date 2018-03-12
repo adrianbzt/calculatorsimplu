@@ -42,14 +42,13 @@ class App extends Component {
       break;
 
     }
-
     this.setState({
-      cost: this.state.cost / conversionRate,
-      cost_month: this.state.cost_month / conversionRate,
-      cost_year: this.state.cost_year / conversionRate,
+      cost: Math.round(this.state.cost / conversionRate, 2),
+      cost_month: Math.round(this.state.cost_month / conversionRate, 2),
+      cost_year: Math.round(this.state.cost_year / conversionRate, 2),
     });
 
-    console.log(conversionRate)
+
   };
 
   resetFields(event) {
@@ -64,25 +63,25 @@ class App extends Component {
 
   handleCostPerHourChange(event) {
     this.setState({
-      cost_year: event.target.value * 8 * 21 * 12,
-      cost_month: event.target.value * 8 * 21,
-      cost: event.target.value,
+      cost_year: Math.round(event.target.value * 8 * 21 * 12, 2),
+      cost_month: Math.round(event.target.value * 8 * 21, 2),
+      cost: Math.round(event.target.value, 2),
     });
   }
 
   handleCostPerMonthChange(event) {
     this.setState({
-      cost_year: event.target.value * 12,
-      cost_month: event.target.value,
-      cost: event.target.value / 8 / 21,
+      cost_year: Math.round(event.target.value * 12, 2),
+      cost_month: Math.round(event.target.value, 2),
+      cost: Math.round(event.target.value / 8 / 21, 2),
     });
   }
 
   handleCostPerYearChange(event) {
     this.setState({
-      cost_year: event.target.value,
-      cost_month: event.target.value / 12,
-      cost: event.target.value / 8 / 21 / 12,
+      cost_year: Math.round(event.target.value, 2),
+      cost_month: Math.round(event.target.value / 12, 2),
+      cost: Math.round(event.target.value / 8 / 21 / 12, 2),
     });
   }
 

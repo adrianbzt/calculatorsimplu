@@ -3,6 +3,8 @@ import { MenuItem } from 'material-ui/Menu';
 import Select from 'material-ui/Select';
 import Input from 'material-ui/Input';
 import TextField from 'material-ui/TextField';
+import Button from 'material-ui/Button';
+
 
 class App extends Component {
     constructor(props) {
@@ -12,6 +14,7 @@ class App extends Component {
     this.handleCostPerHourChange = this.handleCostPerHourChange.bind(this);
     this.handleCostPerMonthChange = this.handleCostPerMonthChange.bind(this);
     this.handleCostPerYearChange = this.handleCostPerYearChange.bind(this);
+    this.resetFields = this.resetFields.bind(this);
   }
   state = {
     name: '',
@@ -23,7 +26,41 @@ class App extends Component {
 
   handleCurrencyChange(event){
     this.setState({currency: event.target.value});
+    let conversionRate;
+    switch(event.target.value) {
+      case 'EUR':
+        conversionRate = 4.7;
+      break;
+      case 'USD':
+        conversionRate = 3.8;
+      break;
+      case 'RON':
+        conversionRate = 1;
+      break;
+      default:
+        conversionRate = 1;
+      break;
+
+    }
+
+    this.setState({
+      cost: this.state.cost / conversionRate,
+      cost_month: this.state.cost_month / conversionRate,
+      cost_year: this.state.cost_year / conversionRate,
+    });
+
+    console.log(conversionRate)
   };
+
+  resetFields(event) {
+    this.setState({
+      cost: 0,
+      cost_month: 0,
+      cost_year: 0,
+      name: '',
+      currency: 'RON',
+    });
+  }
 
   handleCostPerHourChange(event) {
     this.setState({
@@ -104,6 +141,10 @@ class App extends Component {
       <MenuItem value={'USD'}>USD $</MenuItem>
 
       </Select>
+      <Button variant="raised" color="primary"
+        onClick={this.resetFields}>
+        Reset
+      </Button>
     </div>
     );
   }

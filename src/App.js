@@ -1,20 +1,53 @@
 import React, { Component } from 'react';
 import { MenuItem } from 'material-ui/Menu';
 import Select from 'material-ui/Select';
-import Input, { InputLabel } from 'material-ui/Input';
+import Input from 'material-ui/Input';
 import TextField from 'material-ui/TextField';
 
 class App extends Component {
     constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
+    this.handleCurrencyChange = this.handleCurrencyChange.bind(this);
+    this.handleCostPerHourChange = this.handleCostPerHourChange.bind(this);
+    this.handleCostPerMonthChange = this.handleCostPerMonthChange.bind(this);
+    this.handleCostPerYearChange = this.handleCostPerYearChange.bind(this);
   }
   state = {
     name: '',
     currency: 'RON',
     cost: 0,
-    cost_month: 7777
+    cost_month: 0,
+    cost_year: 0,
   };
+
+  handleCurrencyChange(event){
+    this.setState({currency: event.target.value});
+  };
+
+  handleCostPerHourChange(event) {
+    this.setState({
+      cost_year: event.target.value * 8 * 21 * 12,
+      cost_month: event.target.value * 8 * 21,
+      cost: event.target.value,
+    });
+  }
+
+  handleCostPerMonthChange(event) {
+    this.setState({
+      cost_year: event.target.value * 12,
+      cost_month: event.target.value,
+      cost: event.target.value / 8 / 21,
+    });
+  }
+
+  handleCostPerYearChange(event) {
+    this.setState({
+      cost_year: event.target.value,
+      cost_month: event.target.value / 12,
+      cost: event.target.value / 8 / 21 / 12,
+    });
+  }
 
   handleChange = name => event => {
     this.setState({
@@ -22,9 +55,8 @@ class App extends Component {
     });
   };
 
-  render() {
 
-     const { classes } = this.props;
+  render() {
 
     return (
       <div>
@@ -32,7 +64,7 @@ class App extends Component {
           id="number"
           label="Cost Per Hour"
           value={this.state.cost}
-          onChange={this.handleChange('cost').bind(this)}
+          onChange={this.handleCostPerHourChange}
           type="number"
           InputLabelProps={{
             shrink: true,
@@ -43,7 +75,7 @@ class App extends Component {
           id="number"
           label="Cost Per Month"
           value={this.state.cost_month}
-          onChange={this.handleChange('cost_month').bind(this)}
+          onChange={this.handleCostPerMonthChange}
           type="number"
           InputLabelProps={{
             shrink: true,
@@ -53,8 +85,8 @@ class App extends Component {
         <TextField
           id="number"
           label="Cost Per Year"
-          value={this.state.cost}
-          onChange={this.handleChange('cost').bind(this)}
+          value={this.state.cost_year}
+          onChange={this.handleCostPerYearChange}
           type="number"
           InputLabelProps={{
             shrink: true,
@@ -63,7 +95,7 @@ class App extends Component {
         />
         <Select
           value={this.state.currency}
-          onChange={this.handleChange('currency').bind(this)}
+          onChange={this.handleCurrencyChange}
           input={<Input name="currency" id="currency-helper" />}
 >
 

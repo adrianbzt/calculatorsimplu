@@ -8,6 +8,19 @@ import Button from 'material-ui/Button';
 const monthFormula = 8 * 21;
 const yearFormula = monthFormula * 12;
 
+const conversions = {
+  'RON': {},
+  'EUR': {},
+  'USD': {},
+};
+
+conversions['RON']['EUR'] =  4.7;
+conversions['RON']['USD'] =  3.8;
+conversions['EUR']['USD'] =  0.8;
+conversions['EUR']['RON'] =  0.2;
+conversions['USD']['EUR'] =  1.2;
+conversions['USD']['RON'] =  0.2;
+
 class App extends Component {
     constructor(props) {
     super(props);
@@ -30,28 +43,13 @@ class App extends Component {
 
     let conversionRate = 1;
 
-    let conversions = {
-      'RON': {},
-      'EUR': {},
-      'USD': {},
-    };
-
-
     if (oldCurrency !== newCurrency) {
-      conversions['RON']['EUR'] =  4.7;
-      conversions['RON']['USD'] =  3.8;
-      conversions['EUR']['USD'] =  0.8;
-      conversions['EUR']['RON'] =  0.2;
-      conversions['USD']['EUR'] =  1.2;
-      conversions['USD']['RON'] =  0.2;
-
       conversionRate = conversions[oldCurrency][newCurrency];
-      console.log(conversionRate + ' from: ' + oldCurrency + ' to:' + newCurrency);
     }
     this.setState({
       cost: Math.round(this.state.cost / conversionRate * 100) / 100,
       cost_month: Math.round(this.state.cost_month / conversionRate * 100) / 100,
-      cost_year: Math.round(this.state.cost_year / conversionRate * 100) /100,
+      cost_year: Math.round(this.state.cost_year / conversionRate * 100) / 100,
     });
 
 

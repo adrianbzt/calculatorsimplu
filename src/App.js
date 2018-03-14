@@ -5,47 +5,53 @@ import Input from 'material-ui/Input';
 import TextField from 'material-ui/TextField';
 import Button from 'material-ui/Button';
 
+const monthFormula = 8 * 21;
+const yearFormula = monthFormula * 12;
 
 class App extends Component {
     constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
     this.handleCurrencyChange = this.handleCurrencyChange.bind(this);
-    this.handleCostPerHourChange = this.handleCostPerHourChange.bind(this);
-    this.handleCostPerMonthChange = this.handleCostPerMonthChange.bind(this);
-    this.handleCostPerYearChange = this.handleCostPerYearChange.bind(this);
     this.resetFields = this.resetFields.bind(this);
   }
   state = {
     name: '',
     currency: 'RON',
-    cost: 0,
-    cost_month: 0,
-    cost_year: 0,
+    cost: '',
+    cost_month: '',
+    cost_year: '',
   };
 
   handleCurrencyChange(event){
     this.setState({currency: event.target.value});
-    let conversionRate;
-    switch(event.target.value) {
-      case 'EUR':
-        conversionRate = 4.7;
-      break;
-      case 'USD':
-        conversionRate = 3.8;
-      break;
-      case 'RON':
-        conversionRate = 1;
-      break;
-      default:
-        conversionRate = 1;
-      break;
+    let oldCurrency = this.state.currency;
+    let newCurrency = event.target.value;
 
+    let conversionRate = 1;
+
+    let conversions = {
+      'RON': {},
+      'EUR': {},
+      'USD': {},
+    };
+
+
+    if (oldCurrency !== newCurrency) {
+      conversions['RON']['EUR'] =  4.7;
+      conversions['RON']['USD'] =  3.8;
+      conversions['EUR']['USD'] =  0.8;
+      conversions['EUR']['RON'] =  0.2;
+      conversions['USD']['EUR'] =  1.2;
+      conversions['USD']['RON'] =  0.2;
+
+      conversionRate = conversions[oldCurrency][newCurrency];
+      console.log(conversionRate + ' from: ' + oldCurrency + ' to:' + newCurrency);
     }
     this.setState({
-      cost: Math.round(this.state.cost / conversionRate, 2),
-      cost_month: Math.round(this.state.cost_month / conversionRate, 2),
-      cost_year: Math.round(this.state.cost_year / conversionRate, 2),
+      cost: Math.round(this.state.cost / conversionRate * 100) / 100,
+      cost_month: Math.round(this.state.cost_month / conversionRate * 100) / 100,
+      cost_year: Math.round(this.state.cost_year / conversionRate * 100) /100,
     });
 
 
@@ -53,36 +59,22 @@ class App extends Component {
 
   resetFields(event) {
     this.setState({
-      cost: 0,
-      cost_month: 0,
-      cost_year: 0,
+      cost: '',
+      cost_month: '',
+      cost_year: '',
       name: '',
       currency: 'RON',
     });
   }
 
-  handleCostPerHourChange(event) {
-    this.setState({
-      cost_year: Math.round(event.target.value * 8 * 21 * 12, 2),
-      cost_month: Math.round(event.target.value * 8 * 21, 2),
-      cost: Math.round(event.target.value, 2),
-    });
-  }
-
-  handleCostPerMonthChange(event) {
-    this.setState({
-      cost_year: Math.round(event.target.value * 12, 2),
-      cost_month: Math.round(event.target.value, 2),
-      cost: Math.round(event.target.value / 8 / 21, 2),
-    });
-  }
-
-  handleCostPerYearChange(event) {
-    this.setState({
-      cost_year: Math.round(event.target.value, 2),
-      cost_month: Math.round(event.target.value / 12, 2),
-      cost: Math.round(event.target.value / 8 / 21 / 12, 2),
-    });
+  handleCostChange(formula) {
+    return function(event) {
+      this.setState({
+        cost_year: Math.round(event.target.value * formula * yearFormula * 100) / 100,
+        cost_month: Math.round(event.target.value * formula * monthFormula * 100) / 100,
+        cost: Math.round(event.target.value * formula * 100)/ 100,
+      });
+    };
   }
 
   handleChange = name => event => {
@@ -100,7 +92,7 @@ class App extends Component {
           id="number"
           label="Cost Per Hour"
           value={this.state.cost}
-          onChange={this.handleCostPerHourChange}
+          onChange={this.handleCostChange(1).bind(this)}
           type="number"
           InputLabelProps={{
             shrink: true,
@@ -111,7 +103,7 @@ class App extends Component {
           id="number"
           label="Cost Per Month"
           value={this.state.cost_month}
-          onChange={this.handleCostPerMonthChange}
+          onChange={this.handleCostChange(1/monthFormula).bind(this)}
           type="number"
           InputLabelProps={{
             shrink: true,
@@ -122,7 +114,7 @@ class App extends Component {
           id="number"
           label="Cost Per Year"
           value={this.state.cost_year}
-          onChange={this.handleCostPerYearChange}
+          onChange={this.handleCostChange(1/yearFormula).bind(this)}
           type="number"
           InputLabelProps={{
             shrink: true,

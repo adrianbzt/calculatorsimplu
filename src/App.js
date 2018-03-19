@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
 import { MenuItem } from 'material-ui/Menu';
+import PropTypes from 'prop-types';
+import { withStyles } from 'material-ui/styles';
 import Select from 'material-ui/Select';
 import Input from 'material-ui/Input';
 import TextField from 'material-ui/TextField';
 import Button from 'material-ui/Button';
+import Modal from 'material-ui/Modal';
+import _ from 'lodash';
 
 const monthFormula = 8 * 21;
 const yearFormula = monthFormula * 12;
@@ -13,6 +17,31 @@ const conversions = {
   'EUR': {},
   'USD': {},
 };
+
+const styles = theme => ({
+  paper: {
+    position: 'absolute',
+    width: theme.spacing.unit * 50,
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing.unit * 4,
+  },
+});
+
+function getModalStyle() {
+  const top = 50 + rand();
+  const left = 50 + rand();
+
+  return {
+    top: `${top}%`,
+    left: `${left}%`,
+    transform: `translate(-${top}%, -${left}%)`,
+  };
+}
+
+function rand() {
+  return Math.round(Math.random() * 20) - 10;
+}
 
 conversions['RON']['EUR'] =  4.7;
 conversions['RON']['USD'] =  3.8;
@@ -27,6 +56,10 @@ class App extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleCurrencyChange = this.handleCurrencyChange.bind(this);
     this.resetFields = this.resetFields.bind(this);
+    this.openModal = this.openModal.bind(this);
+    this.closeModal = this.closeModal.bind(this);
+    this.addNewCurrency = this.addNewCurrency.bind(this);
+    this.updateField = this.updateField.bind(this);
   }
   state = {
     name: '',
@@ -34,6 +67,27 @@ class App extends Component {
     cost: '',
     cost_month: '',
     cost_year: '',
+    open: false,
+    new_currency_name: '',
+    new_currency_exchange: '',
+    currencies: [
+      {
+        value: "RON",
+        label: "RON",
+        exchange: 4.7
+
+      },
+      {
+        value: "EUR",
+        label: "EUR €",
+        echange: 1,
+      },
+      {
+        value: "USD",
+        label: "USD $",
+        exchange: 0.8
+      },
+    ]
   };
 
   handleCurrencyChange(event){
@@ -62,6 +116,7 @@ class App extends Component {
       cost_year: '',
       name: '',
       currency: 'RON',
+      open: false,
     });
   }
 
@@ -81,8 +136,52 @@ class App extends Component {
     });
   };
 
+  openModal() {
+    this.setState({
+      open: true
+    })
+  }
+
+  closeModal() {
+    this.setState({open: false});
+  }
+
+  addNewCurrency() {
+
+    // let newEntry = this.state.currencies.concat(
+    //   [{
+    //   value: this.state.new_currency_name,
+    //   label: this.state.new_currency_name
+    //   }]
+    // );
+
+    let newEntry = _.concat(
+      this.state.currencies,
+      {
+        value: this.state.new_currency_name,
+        label: this.state.new_currency_name
+      }
+    );
+
+    this.setState({
+      currencies: newEntry
+    }
+    )
+
+    this.closeModal();
+  }
+
+  updateField (name) {
+    return (event) => {
+      this.setState( {
+        [name] : event.target.value
+      })
+    }
+  }
 
   render() {
+
+    const { classes } = this.props;
 
     return (
       <div>
@@ -124,19 +223,59 @@ class App extends Component {
           onChange={this.handleCurrencyChange}
           input={<Input name="currency" id="currency-helper" />}
 >
-
-      <MenuItem value={'RON'}>RON</MenuItem>
-      <MenuItem value={'EUR'}>EUR €</MenuItem>
-      <MenuItem value={'USD'}>USD $</MenuItem>
+      {
+        this.state.currencies.map((test) => {
+         return <MenuItem key= {test.value} value={test.value}>{test.label}</MenuItem>
+      })
+      }
 
       </Select>
       <Button variant="raised" color="primary"
         onClick={this.resetFields}>
         Reset
       </Button>
+
+      <Modal open={this.state.open} onClose={this.closeModal}>
+        <div style={getModalStyle()} className={classes.paper}>
+          <TextField
+            id="number"
+            label="New Currency Name"
+            value={this.state.new_currency_name}
+            type="text"
+            onChange={this.updateField('new_currency_name')}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            margin="normal"
+          />
+          <TextField
+            id="number"
+            label="EURO Exchange Rate"
+            value={this.state.new_currency_exchange}
+            type="number"
+            onChange={this.updateField('new_currency_exchange')}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            margin="normal"
+          />
+        <Button variant="raised" color="primary"
+          onClick={this.addNewCurrency}> Add </Button>
+        </div>
+      </Modal>
+
+      <Button variant="raised" color="default"
+        onClick={this.openModal}>
+        Settings
+      </Button>
+
     </div>
     );
   }
 }
 
-export default App;
+App.propTypes = {
+  classes: PropTypes.object.isRequired,
+};
+
+export default withStyles(styles)(App);

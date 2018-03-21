@@ -8,6 +8,10 @@ import TextField from 'material-ui/TextField';
 import Button from 'material-ui/Button';
 import Modal from 'material-ui/Modal';
 import _ from 'lodash';
+import List, { ListItem, ListItemSecondaryAction, ListItemText } from 'material-ui/List';
+import DeleteIcon from 'material-ui-icons/Delete';
+import IconButton from 'material-ui/IconButton';
+import InputFields from './InputFields';
 
 const monthFormula = 8 * 21;
 const yearFormula = monthFormula * 12;
@@ -39,16 +43,13 @@ function getModalStyle() {
   };
 }
 
-function rand() {
-  return Math.round(Math.random() * 20) - 10;
-}
-
 conversions['RON']['EUR'] =  4.7;
 conversions['RON']['USD'] =  3.8;
 conversions['EUR']['USD'] =  0.8;
 conversions['EUR']['RON'] =  0.2;
 conversions['USD']['EUR'] =  1.2;
 conversions['USD']['RON'] =  0.2;
+conversions['RON']['RUB'] =  4.7;
 
 class App extends Component {
     constructor(props) {
@@ -60,6 +61,7 @@ class App extends Component {
     this.closeModal = this.closeModal.bind(this);
     this.addNewCurrency = this.addNewCurrency.bind(this);
     this.updateField = this.updateField.bind(this);
+    this.removeCurrency = this.removeCurrency.bind(this);
   }
   state = {
     name: '',
@@ -75,16 +77,15 @@ class App extends Component {
         value: "RON",
         label: "RON",
         exchange: 4.7
-
       },
       {
         value: "EUR",
-        label: "EUR €",
+        label: "EUR",
         echange: 1,
       },
       {
         value: "USD",
-        label: "USD $",
+        label: "USD",
         exchange: 0.8
       },
     ]
@@ -143,32 +144,64 @@ class App extends Component {
   }
 
   closeModal() {
-    this.setState({open: false});
+    this.setState({
+      open: false,
+      new_currency_name: '',
+      new_currency_exchange: '',
+    });
   }
 
   addNewCurrency() {
 
-    // let newEntry = this.state.currencies.concat(
-    //   [{
-    //   value: this.state.new_currency_name,
-    //   label: this.state.new_currency_name
-    //   }]
-    // );
+    let currencies = this.state.currencies.map(obj => obj.value);
 
-    let newEntry = _.concat(
-      this.state.currencies,
-      {
-        value: this.state.new_currency_name,
-        label: this.state.new_currency_name
-      }
-    );
+    let isPresent =  _.indexOf(currencies, this.state.new_currency_name);
 
-    this.setState({
-      currencies: newEntry
+    if(isPresent === -1) {
+      // js way
+      // let newEntry = this.state.currencies.concat(
+      //   [{
+      //   value: this.state.new_currency_name,
+      //   label: this.state.new_currency_name
+      //   }]
+      // );
+
+      // lodash way
+      let newEntry = _.concat(
+        this.state.currencies,
+        {
+          value: this.state.new_currency_name,
+          label: this.state.new_currency_name,
+          exchange: this.state.new_currency_exchange
+        }
+      );
+
+      this.setState({
+        currencies: newEntry
+      });
+
     }
-    )
-
     this.closeModal();
+  }
+
+  removeCurrency(key) {
+
+    return () => {
+
+      let updatedCurrencies = _.remove(this.state.currencies, function(n) {
+
+        if(n.value !== key) {
+          return n;
+        }
+      });
+
+
+    if(_.size(updatedCurrencies) >= 1) {
+      this.setState({
+        currencies: updatedCurrencies
+      })
+    }
+    }
   }
 
   updateField (name) {
@@ -185,6 +218,7 @@ class App extends Component {
 
     return (
       <div>
+        <InputFields />
         <TextField
           id="number"
           label="Cost Per Hour"
@@ -222,7 +256,7 @@ class App extends Component {
           value={this.state.currency}
           onChange={this.handleCurrencyChange}
           input={<Input name="currency" id="currency-helper" />}
->
+          >
       {
         this.state.currencies.map((test) => {
          return <MenuItem key= {test.value} value={test.value}>{test.label}</MenuItem>
@@ -259,8 +293,33 @@ class App extends Component {
             }}
             margin="normal"
           />
+
+
         <Button variant="raised" color="primary"
           onClick={this.addNewCurrency}> Add </Button>
+
+<List component="nav">
+          {
+            this.state.currencies.map((test) => {
+             return (
+             <div key= {"remove-" + test.value}>
+
+               <ListItem key= {test.value} button>
+                 <ListItemText primary={test.label} />
+                   <ListItemSecondaryAction>
+                        <IconButton aria-label="Delete" onClick={this.removeCurrency(test.value)}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </ListItemSecondaryAction>
+               </ListItem>
+
+
+             </div>
+             )
+          })
+          }
+</List>
+
         </div>
       </Modal>
 

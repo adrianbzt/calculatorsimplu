@@ -8,6 +8,8 @@
     "material-ui-icons": "^1.0.0-beta.36",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
+    "react-grid-layout": "^0.16.6",
+    "react-gridstack": "^0.1.4",
     "react-scripts": "1.1.1"
   },
   "scripts": {

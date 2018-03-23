@@ -62,6 +62,7 @@ class App extends Component {
     this.addNewCurrency = this.addNewCurrency.bind(this);
     this.updateField = this.updateField.bind(this);
     this.removeCurrency = this.removeCurrency.bind(this);
+    this.addCurrencyComponent = this.addCurrencyComponent.bind(this);
   }
   state = {
     name: '',
@@ -88,9 +89,16 @@ class App extends Component {
         label: "USD",
         exchange: 0.8
       },
-    ]
+    ],
+    widgets: [
+      'EUR',
+      'USD'
+    ],
   };
 
+addCurrencyComponent() {
+    console.log('let s add a component');
+}
   handleCurrencyChange(event){
     this.setState({currency: event.target.value});
     let oldCurrency = this.state.currency;
@@ -218,7 +226,23 @@ class App extends Component {
 
     return (
       <div>
-        <InputFields />
+
+        {
+          this.state.widgets.map((widgetName) => {
+            return (
+
+            <InputFields key={widgetName}
+              cost={this.state.cost}
+              costMonth={this.state.cost_month}
+              costYear={this.state.cost_year}
+              costHourly={this.handleCostChange(1).bind(this)}
+              costMonthly={this.handleCostChange(1/monthFormula).bind(this)}
+              costYearly={this.handleCostChange(1/yearFormula).bind(this)}
+              />
+            )
+        })
+        }
+
         <TextField
           id="number"
           label="Cost Per Hour"
@@ -327,6 +351,12 @@ class App extends Component {
         onClick={this.openModal}>
         Settings
       </Button>
+
+      <Button variant="raised" color="secondary"
+        onClick={this.addCurrencyComponent}>
+  Add
+</Button>
+
 
     </div>
     );

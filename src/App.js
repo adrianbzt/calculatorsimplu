@@ -102,12 +102,13 @@ class App extends Component {
     ],
     buttons: [
       {
-        color: "default",
+        gigel: "primary",
       },
     ]
   };
 
 addCurrencyComponent() {
+    this.changeColor();
     console.log('let s add a component');
 }
   handleCurrencyChange(event){
@@ -181,7 +182,7 @@ addCurrencyComponent() {
     console.log(rand)
     console.log(values[rand])
 
-    let color = [{color: values[rand]}];
+    let color = [{gigel: values[rand]}];
     this.setState({
       buttons: color
     })
@@ -390,12 +391,11 @@ addCurrencyComponent() {
 
 {
   this.state.buttons.map((test) => {
-    console.log(test)
     return (
-
-      <Button variant="raised" backgroundcolor="#673ab7" color={test.color} key={test.color} onClick={this.changeColor}>
-        {test.color}
+      <Button variant="raised" backgroundcolor="#673ab7" color={test.gigel} key={test.gigel} onClick={this.changeColor}>
+        Click Me!
       </Button>
+      //<div key={test.color} style="color:red"> Ana Are mere</div>
     )
   })
 }

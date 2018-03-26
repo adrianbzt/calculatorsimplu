@@ -63,6 +63,7 @@ class App extends Component {
     this.updateField = this.updateField.bind(this);
     this.removeCurrency = this.removeCurrency.bind(this);
     this.addCurrencyComponent = this.addCurrencyComponent.bind(this);
+    this.changeColor = this.changeColor.bind(this);
   }
   state = {
     name: '',
@@ -89,11 +90,21 @@ class App extends Component {
         label: "USD",
         exchange: 0.8
       },
+      {
+        value: "RUB",
+        label: "RUB",
+        exchange: 0.8
+      },
     ],
     widgets: [
       'EUR',
       'USD'
     ],
+    buttons: [
+      {
+        color: "default",
+      },
+    ]
   };
 
 addCurrencyComponent() {
@@ -157,6 +168,25 @@ addCurrencyComponent() {
       new_currency_name: '',
       new_currency_exchange: '',
     });
+  }
+
+  changeColor(event) {
+
+    console.log(this.state.buttons)
+
+    let values = ["secondary", "default", "primary"];
+
+    let rand = Math.floor(Math.random() * Math.floor(values.length));
+
+    console.log(rand)
+    console.log(values[rand])
+
+    let color = [{color: values[rand]}];
+    this.setState({
+      buttons: color
+    })
+
+    console.log(this.state.buttons)
   }
 
   addNewCurrency() {
@@ -358,6 +388,17 @@ addCurrencyComponent() {
 </Button>
 
 
+{
+  this.state.buttons.map((test) => {
+    console.log(test)
+    return (
+
+      <Button variant="raised" backgroundcolor="#673ab7" color={test.color} key={test.color} onClick={this.changeColor}>
+        {test.color}
+      </Button>
+    )
+  })
+}
     </div>
     );
   }

@@ -5,17 +5,15 @@ import ReactGridLayout from 'react-grid-layout';
 
 class InputFields extends Component {
 
-
-
 render() {
 
   let layout = [
-       {i: 'a', x: 0, y: 0, w: 6, h: 4, minW: 6, maxW: 6},
+       {i: 'a', x: 0, y: 0, w: 8, h: 3},
      ];
 
         return (
-          <ReactGridLayout className="layout"
-          layout={layout} cols={12} rowHeight={30} width={1200}>
+          // <ReactGridLayout className="layout"
+          // layout={layout} cols={12} rowHeight={30} width={1200}>
             <div key="a">
             <TextField
               id="number"
@@ -27,6 +25,7 @@ render() {
                 shrink: true,
               }}
               margin="normal"
+              helperText={this.props.currency}
             />
             <TextField
               id="number"
@@ -38,6 +37,7 @@ render() {
                 shrink: true,
               }}
               margin="normal"
+              helperText={this.props.currency}
             />
 
             <TextField
@@ -50,9 +50,10 @@ render() {
                 shrink: true,
               }}
               margin="normal"
+              helperText={this.props.currency}
             />
             </div>
-          </ReactGridLayout>
+          // </ReactGridLayout>
         )
       }
 }

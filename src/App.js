@@ -97,8 +97,6 @@ class App extends Component {
       },
     ],
     widgets: [
-      'EUR',
-      'USD'
     ],
     buttons: [
       {
@@ -108,8 +106,28 @@ class App extends Component {
   };
 
 addCurrencyComponent() {
-    this.changeColor();
     console.log('let s add a component');
+
+    // lodash way
+    let newEntry = _.concat(
+      this.state.widgets,
+      {
+        currency: 'RUB',
+        exchange: 15.33,
+      },
+      {
+        currency: 'EUR',
+        exchange: 0.21,
+      },
+      {
+        currency: 'USD',
+        exchange: 0.27,
+      },
+    );
+
+    this.setState({
+      widgets: newEntry
+    });
 }
   handleCurrencyChange(event){
     this.setState({currency: event.target.value});
@@ -141,7 +159,16 @@ addCurrencyComponent() {
     });
   }
 
-  handleCostChange(formula) {
+  handleCostChange(formula, exchange, event) {
+    console.log(event.target.value, formula, exchange)
+      this.setState({
+        cost_year: Math.round(event.target.value * formula * yearFormula / exchange * 100) / 100,
+        cost_month: Math.round(event.target.value * formula * monthFormula / exchange * 100) / 100,
+        cost: Math.round(event.target.value * formula / exchange * 100)/ 100,
+      });
+  }
+
+  handleCostChangeOld(formula) {
     return function(event) {
       this.setState({
         cost_year: Math.round(event.target.value * formula * yearFormula * 100) / 100,
@@ -186,8 +213,6 @@ addCurrencyComponent() {
     this.setState({
       buttons: color
     })
-
-    console.log(this.state.buttons)
   }
 
   addNewCurrency() {
@@ -257,68 +282,55 @@ addCurrencyComponent() {
 
     return (
       <div>
-
-        {
-          this.state.widgets.map((widgetName) => {
-            return (
-
-            <InputFields key={widgetName}
-              cost={this.state.cost}
-              costMonth={this.state.cost_month}
-              costYear={this.state.cost_year}
-              costHourly={this.handleCostChange(1).bind(this)}
-              costMonthly={this.handleCostChange(1/monthFormula).bind(this)}
-              costYearly={this.handleCostChange(1/yearFormula).bind(this)}
-              />
-            )
-        })
-        }
-
         <TextField
           id="number"
           label="Cost Per Hour"
           value={this.state.cost}
-          onChange={this.handleCostChange(1).bind(this)}
+          onChange={this.handleCostChange.bind(this, 1, 1)}
           type="number"
           InputLabelProps={{
             shrink: true,
           }}
           margin="normal"
+          helperText={this.state.currency}
         />
         <TextField
           id="number"
           label="Cost Per Month"
           value={this.state.cost_month}
-          onChange={this.handleCostChange(1/monthFormula).bind(this)}
+          onChange={this.handleCostChange.bind(this, 1/monthFormula, 1)}
           type="number"
           InputLabelProps={{
             shrink: true,
           }}
           margin="normal"
+          helperText={this.state.currency}
         />
         <TextField
           id="number"
           label="Cost Per Year"
           value={this.state.cost_year}
-          onChange={this.handleCostChange(1/yearFormula).bind(this)}
+          onChange={this.handleCostChange.bind(this, 1/yearFormula, 1)}
           type="number"
           InputLabelProps={{
             shrink: true,
           }}
           margin="normal"
+          helperText={this.state.currency}
         />
-        <Select
+      {/*<Select
           value={this.state.currency}
           onChange={this.handleCurrencyChange}
           input={<Input name="currency" id="currency-helper" />}
           >
-      {
-        this.state.currencies.map((test) => {
-         return <MenuItem key= {test.value} value={test.value}>{test.label}</MenuItem>
-      })
-      }
+          {
+            this.state.currencies.map((test) => {
+             return <MenuItem key= {test.value} value={test.value}>{test.label}</MenuItem>
+          })
+          }
 
       </Select>
+      */}
       <Button variant="raised" color="primary"
         onClick={this.resetFields}>
         Reset
@@ -353,7 +365,7 @@ addCurrencyComponent() {
         <Button variant="raised" color="primary"
           onClick={this.addNewCurrency}> Add </Button>
 
-<List component="nav">
+        <List component="nav">
           {
             this.state.currencies.map((test) => {
              return (
@@ -373,7 +385,7 @@ addCurrencyComponent() {
              )
           })
           }
-</List>
+        </List>
 
         </div>
       </Modal>
@@ -385,20 +397,36 @@ addCurrencyComponent() {
 
       <Button variant="raised" color="secondary"
         onClick={this.addCurrencyComponent}>
-  Add
-</Button>
-
-
-{
-  this.state.buttons.map((test) => {
-    return (
-      <Button variant="raised" backgroundcolor="#673ab7" color={test.gigel} key={test.gigel} onClick={this.changeColor}>
-        Click Me!
+        Add
       </Button>
-      //<div key={test.color} style="color:red"> Ana Are mere</div>
-    )
-  })
-}
+
+      {
+        this.state.buttons.map((test) => {
+          return (
+            <Button variant="raised" backgroundcolor="#673ab7" color={test.gigel} key={test.gigel} onClick={this.changeColor}>
+              Click Me!
+            </Button>
+            //<div key={test.color} style="color:red"> Ana Are mere</div>
+          )
+        })
+      }
+
+      {
+        this.state.widgets.map((widgetName) => {
+
+          return (
+            <InputFields key={widgetName.currency}
+              currency={widgetName.currency}
+              cost={Math.round(this.state.cost * widgetName.exchange * 100) / 100}
+              costMonth={Math.round(this.state.cost_month * widgetName.exchange * 100) / 100}
+              costYear={Math.round(this.state.cost_year * widgetName.exchange * 100) / 100}
+              costHourly={this.handleCostChange.bind(this, 1, parseFloat(widgetName.exchange))}
+              costMonthly={this.handleCostChange.bind(this, 1/monthFormula, parseFloat(widgetName.exchange))}
+              costYearly={this.handleCostChange.bind(this, 1/yearFormula, parseFloat(widgetName.exchange))}
+              />
+          )
+        })
+      }
     </div>
     );
   }

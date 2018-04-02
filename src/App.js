@@ -10,6 +10,7 @@ import Modal from 'material-ui/Modal';
 import _ from 'lodash';
 import List, { ListItem, ListItemSecondaryAction, ListItemText } from 'material-ui/List';
 import DeleteIcon from 'material-ui-icons/Delete';
+import AddIcon from 'material-ui-icons/Add';
 import IconButton from 'material-ui/IconButton';
 import InputFields from './InputFields';
 
@@ -43,13 +44,13 @@ function getModalStyle() {
   };
 }
 
-conversions['RON']['EUR'] =  4.7;
-conversions['RON']['USD'] =  3.8;
-conversions['EUR']['USD'] =  0.8;
-conversions['EUR']['RON'] =  0.2;
-conversions['USD']['EUR'] =  1.2;
-conversions['USD']['RON'] =  0.2;
-conversions['RON']['RUB'] =  4.7;
+// conversions['RON']['EUR'] =  4.7;
+// conversions['RON']['USD'] =  3.8;
+// conversions['EUR']['USD'] =  0.8;
+// conversions['EUR']['RON'] =  0.2;
+// conversions['USD']['EUR'] =  1.2;
+// conversions['USD']['RON'] =  0.2;
+// conversions['RON']['RUB'] =  4.7;
 
 class App extends Component {
     constructor(props) {
@@ -64,6 +65,8 @@ class App extends Component {
     this.removeCurrency = this.removeCurrency.bind(this);
     this.addCurrencyComponent = this.addCurrencyComponent.bind(this);
     this.changeColor = this.changeColor.bind(this);
+    this.openCurrencyModal = this.openCurrencyModal.bind(this);
+    this.closeCurrencyModal = this.closeCurrencyModal.bind(this);
   }
   state = {
     name: '',
@@ -72,28 +75,30 @@ class App extends Component {
     cost_month: '',
     cost_year: '',
     open: false,
+    openCurrency: false,
     new_currency_name: '',
     new_currency_exchange: '',
+    toAddCurrency: '',
     currencies: [
       {
         value: "RON",
         label: "RON",
-        exchange: 4.7
+        exchange: 1,
       },
       {
         value: "EUR",
         label: "EUR",
-        echange: 1,
+        exchange: 0.21,
       },
       {
         value: "USD",
         label: "USD",
-        exchange: 0.8
+        exchange: 0.27,
       },
       {
         value: "RUB",
         label: "RUB",
-        exchange: 0.8
+        exchange: 15.33,
       },
     ],
     widgets: [
@@ -105,25 +110,40 @@ class App extends Component {
     ]
   };
 
-addCurrencyComponent() {
-    console.log('let s add a component');
+addCurrencyComponent(toAddCurrency) {
+
+    // // lodash way
+    // let newEntry = _.concat(
+    //   this.state.widgets,
+    //   {
+    //     currency: 'RUB',
+    //     exchange: 15.33,
+    //   },
+    //   {
+    //     currency: 'EUR',
+    //     exchange: 0.21,
+    //   },
+    //   {
+    //     currency: 'USD',
+    //     exchange: 0.27,
+    //   },
+    // );
+
+    let toAdd = this.state.currencies.filter(function(obj) {
+      if(obj.value === toAddCurrency) {
+        return obj;
+      }
+    })
 
     // lodash way
     let newEntry = _.concat(
       this.state.widgets,
-      {
-        currency: 'RUB',
-        exchange: 15.33,
-      },
-      {
-        currency: 'EUR',
-        exchange: 0.21,
-      },
-      {
-        currency: 'USD',
-        exchange: 0.27,
-      },
+      toAdd
     );
+
+    this.setState({
+      openCurrency: false
+    });
 
     this.setState({
       widgets: newEntry
@@ -144,8 +164,6 @@ addCurrencyComponent() {
       cost_month: Math.round(this.state.cost_month / conversionRate * 100) / 100,
       cost_year: Math.round(this.state.cost_year / conversionRate * 100) / 100,
     });
-
-
   };
 
   resetFields(event) {
@@ -160,7 +178,6 @@ addCurrencyComponent() {
   }
 
   handleCostChange(formula, exchange, event) {
-    console.log(event.target.value, formula, exchange)
       this.setState({
         cost_year: Math.round(event.target.value * formula * yearFormula / exchange * 100) / 100,
         cost_month: Math.round(event.target.value * formula * monthFormula / exchange * 100) / 100,
@@ -198,9 +215,19 @@ addCurrencyComponent() {
     });
   }
 
-  changeColor(event) {
+  openCurrencyModal() {
+    this.setState({
+      openCurrency: true
+    })
+  }
 
-    console.log(this.state.buttons)
+  closeCurrencyModal() {
+    this.setState({
+      openCurrency: false,
+    });
+  }
+
+  changeColor(event) {
 
     let values = ["secondary", "default", "primary"];
 
@@ -390,13 +417,41 @@ addCurrencyComponent() {
         </div>
       </Modal>
 
+      <Modal open={this.state.openCurrency} onClose={this.closeCurrencyModal}>
+
+        <div style={getModalStyle()} className={classes.paper}>
+        <List component="nav">
+          {
+            this.state.currencies.map((test) => {
+             return (
+             <div key= {"add-" + test.value}>
+
+               <ListItem key= {test.value} button>
+                 <ListItemText primary={test.label} />
+                   <ListItemSecondaryAction>
+                        <IconButton onClick={() => this.addCurrencyComponent(test.value)}>
+                          <AddIcon />
+                        </IconButton>
+                      </ListItemSecondaryAction>
+               </ListItem>
+
+
+             </div>
+             )
+          })
+          }
+        </List>
+      </div>
+
+      </Modal>
+
       <Button variant="raised" color="default"
         onClick={this.openModal}>
         Settings
       </Button>
 
       <Button variant="raised" color="secondary"
-        onClick={this.addCurrencyComponent}>
+        onClick={this.openCurrencyModal}>
         Add
       </Button>
 
@@ -415,8 +470,8 @@ addCurrencyComponent() {
         this.state.widgets.map((widgetName) => {
 
           return (
-            <InputFields key={widgetName.currency}
-              currency={widgetName.currency}
+            <InputFields key={widgetName.value}
+              value={widgetName.value}
               cost={Math.round(this.state.cost * widgetName.exchange * 100) / 100}
               costMonth={Math.round(this.state.cost_month * widgetName.exchange * 100) / 100}
               costYear={Math.round(this.state.cost_year * widgetName.exchange * 100) / 100}

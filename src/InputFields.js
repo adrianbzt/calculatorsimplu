@@ -25,7 +25,7 @@ render() {
                 shrink: true,
               }}
               margin="normal"
-              helperText={this.props.currency}
+              helperText={this.props.value}
             />
             <TextField
               id="number"
@@ -37,7 +37,7 @@ render() {
                 shrink: true,
               }}
               margin="normal"
-              helperText={this.props.currency}
+              helperText={this.props.value}
             />
 
             <TextField
@@ -50,7 +50,7 @@ render() {
                 shrink: true,
               }}
               margin="normal"
-              helperText={this.props.currency}
+              helperText={this.props.value}
             />
             </div>
           // </ReactGridLayout>

@@ -1,19 +1,11 @@
 import React, { Component } from 'react';
 import TextField from 'material-ui/TextField';
-import ReactGridLayout from 'react-grid-layout';
-
 
 class InputFields extends Component {
 
 render() {
 
-  let layout = [
-       {i: 'a', x: 0, y: 0, w: 8, h: 3},
-     ];
-
         return (
-          // <ReactGridLayout className="layout"
-          // layout={layout} cols={12} rowHeight={30} width={1200}>
             <div key="a">
             <TextField
               id="number"
@@ -53,7 +45,6 @@ render() {
               helperText={this.props.value}
             />
             </div>
-          // </ReactGridLayout>
         )
       }
 }
